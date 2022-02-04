@@ -11,7 +11,6 @@ def getMyIp():
     return urllib.request.urlopen('https://ident.me').read().decode('utf8')
 
 def updateDNS(dns_map):
-    print(dns_map)
     driver = webdriver.Chrome()
     driver.get('https://cp.midominio.do')
 
@@ -45,7 +44,7 @@ def updateDNS(dns_map):
 
 
     for sub_domain in dns_map:
-        print(sub_domain)
+        print(f'updating {sub_domain[0]} to {sub_domain[1]}')
         driver.find_element(By.LINK_TEXT,sub_domain[0]).click()
         driver.find_element(By.CSS_SELECTOR,'input.submit[name="btnModRecord"]').click()
 
