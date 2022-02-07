@@ -1,3 +1,4 @@
+from pyvirtualdisplay import Display
 import logging
 import keyring
 import urllib.request
@@ -16,6 +17,9 @@ logging.basicConfig(filename = 'dns_updater.log',
                             format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
                             datefmt='%Y-%m-%d %H:%M:%S',
                             level=logging.INFO)
+
+display = Display(visible=0, size=(800, 600))
+display.start()
 
 def getMyIp():
     return urllib.request.urlopen('https://ident.me').read().decode('utf8')
@@ -90,7 +94,7 @@ if __name__ == "__main__":
         logging.info(f'real public ip > {current_ip}')
         logging.info(f'dns map ip > {dns_ip}')
 
-        if current_ip == dns_ip:
+        if current_ip != dns_ip:
             logging.info('DNS record good. DNS won\'t be updated.')
         else:
             logging.info('DNS record bad. Updating DNS.')
