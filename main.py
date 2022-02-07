@@ -1,3 +1,4 @@
+import logging
 import keyring
 import urllib.request
 from dns import resolver
@@ -7,6 +8,14 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.common.by import By
 
+
+log = logging.getLogger('dns_updater')
+
+logging.basicConfig(filename = 'dns_updater.log',
+                            filemode='a',
+                            format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
+                            datefmt='%Y-%m-%d %H:%M:%S',
+                            level=logging.INFO)
 
 def getMyIp():
     return urllib.request.urlopen('https://ident.me').read().decode('utf8')
@@ -29,9 +38,9 @@ def updateDNS(dns_map):
     pass_box.send_keys(keyring.get_password('nic_dns_auto_updater',username))
 
     #sleep(5)
-    print('logging in')
+    logging.info('logging in')
     email_box.send_keys(Keys.RETURN)
-    print('logged in')
+    logging.info('logged in')
     #sleep(5)
 
     driver.get('https://cp.midominio.do/servlet/ListAllOrdersServlet?formaction=listOrders')
@@ -48,7 +57,7 @@ def updateDNS(dns_map):
 
 
     for sub_domain in dns_map:
-        print(f'updating {sub_domain[0]} to {sub_domain[1]}')
+        logging.info(f'updating {sub_domain[0]} to {sub_domain[1]}')
         driver.find_element(By.LINK_TEXT,sub_domain[0]).click()
         driver.find_element(By.CSS_SELECTOR,'input.submit[name="btnModRecord"]').click()
 
@@ -62,7 +71,7 @@ def updateDNS(dns_map):
 
     sleep(5)
     driver.quit()
-    print('done')
+    logging.info('done')
 
 
 def getDomainIP(domain):
@@ -73,16 +82,18 @@ def getDomainIP(domain):
 
 
 if __name__ == "__main__":
+    try:
+        dns_ip = getDomainIP('nextcloud.royaltaste.com.do')
+        current_ip = getMyIp()
 
-    dns_ip = getDomainIP('nextcloud.royaltaste.com.do')
-    current_ip = getMyIp()
 
+        logging.info(f'real public ip > {current_ip}')
+        logging.info(f'dns map ip > {dns_ip}')
 
-    print(f'real public ip > {current_ip}')
-    print(f'dns map ip > {dns_ip}')
-
-    if current_ip == dns_ip:
-        print('DNS record good. DNS won\'t be updated.')
-    else:
-        print('DNS record bad. Updating DNS.')
-        updateDNS([['royaltaste.com.do',current_ip],['nextcloud.royaltaste.com.do',current_ip]])
+        if current_ip == dns_ip:
+            logging.info('DNS record good. DNS won\'t be updated.')
+        else:
+            logging.info('DNS record bad. Updating DNS.')
+            updateDNS([['royaltaste.com.do',current_ip],['nextcloud.royaltaste.com.do',current_ip]])
+    except Exception as Argument:
+        logging.exception('Hubo una exception')
