@@ -94,7 +94,7 @@ if __name__ == "__main__":
         logging.info(f'real public ip > {current_ip}')
         logging.info(f'dns map ip > {dns_ip}')
 
-        if current_ip != dns_ip:
+        if current_ip == dns_ip:
             logging.info('DNS record good. DNS won\'t be updated.')
         else:
             logging.info('DNS record bad. Updating DNS.')
