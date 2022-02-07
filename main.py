@@ -1,3 +1,4 @@
+import keyring
 import urllib.request
 from dns import resolver
 from time import sleep
@@ -14,20 +15,23 @@ def updateDNS(dns_map):
     driver = webdriver.Chrome()
     driver.get('https://cp.midominio.do')
 
+    username = 'mojicalewis@gmail.com'
 
     type_box = Select(driver.find_element(By.ID,'login-role'))
     type_box.select_by_visible_text('Cliente')
 
     email_box = driver.find_element(By.ID,'login-username')
     email_box.clear()
-    email_box.send_keys('mojicalewis@gmail.com')
+    email_box.send_keys(username)
 
     pass_box = driver.find_element(By.ID,'login-password')
     pass_box.clear()
-    pass_box.send_keys('TMH0@viB1JXT3')
+    pass_box.send_keys(keyring.get_password('nic_dns_auto_updater',username))
 
     #sleep(5)
+    print('logging in')
     email_box.send_keys(Keys.RETURN)
+    print('logged in')
     #sleep(5)
 
     driver.get('https://cp.midominio.do/servlet/ListAllOrdersServlet?formaction=listOrders')
