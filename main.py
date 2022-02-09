@@ -18,13 +18,14 @@ logging.basicConfig(filename = 'dns_updater.log',
                             datefmt='%Y-%m-%d %H:%M:%S',
                             level=logging.INFO)
 
-display = Display(visible=0, size=(800, 600))
-display.start()
 
 def getMyIp():
     return urllib.request.urlopen('https://ident.me').read().decode('utf8')
 
 def updateDNS(dns_map):
+    display = Display(visible=0, size=(800, 600))
+    display.start()
+
     driver = webdriver.Chrome()
     driver.get('https://cp.midominio.do')
 
@@ -75,6 +76,7 @@ def updateDNS(dns_map):
 
     sleep(5)
     driver.quit()
+    display.stop()
     logging.info('done')
 
 
@@ -94,7 +96,7 @@ if __name__ == "__main__":
         logging.info(f'real public ip > {current_ip}')
         logging.info(f'dns map ip > {dns_ip}')
 
-        if current_ip == dns_ip:
+        if current_ip != dns_ip:
             logging.info('DNS record good. DNS won\'t be updated.')
         else:
             logging.info('DNS record bad. Updating DNS.')
